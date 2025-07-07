@@ -1,0 +1,1435 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الفيديو الذكية - AI Arabic Video Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'arabic': ['Noto Sans Arabic', 'Arial', 'sans-serif']
+                    },
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4A49C0',
+                        'bg-light': '#FFFFFF',
+                        'bg-dark': '#181818',
+                        'gold': '#D4A574',
+                        'emerald': '#059669'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #5D5CDE 0%, #D4A574 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .timeline-track {
+            background: linear-gradient(to right, #f3f4f6 0%, #e5e7eb 100%);
+        }
+        .dark .timeline-track {
+            background: linear-gradient(to right, #374151 0%, #4b5563 100%);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-arabic bg-bg-light dark:bg-bg-dark text-gray-900 dark:text-white transition-colors duration-300">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">🎬 منصة الفيديو الذكية</h1>
+                <div class="flex items-center gap-4">
+                    <button id="projectManagerBtn" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors text-sm">
+                        📁 إدارة المشاريع
+                    </button>
+                    <button id="uploadBtn" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors text-sm">
+                        📤 رفع ملفات
+                    </button>
+                    <span class="text-sm bg-white/20 px-3 py-1 rounded-full">مدعوم بالذكاء الاصطناعي</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Project Manager Modal -->
+    <div id="projectModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="gradient-bg text-white p-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">📁 إدارة المشاريع</h2>
+                    <button id="closeProjectModal" class="text-white/80 hover:text-white text-2xl">×</button>
+                </div>
+            </div>
+            
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- New Project -->
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">➕ مشروع جديد</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="newProjectName" placeholder="اسم المشروع" class="w-full text-base px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                            <textarea id="newProjectDesc" placeholder="وصف المشروع..." class="w-full h-20 text-base px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 resize-none"></textarea>
+                            <button id="createProjectBtn" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dark">
+                                إنشاء مشروع
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Existing Projects -->
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">📋 المشاريع المحفوظة</h3>
+                        <div id="projectsList" class="space-y-2 max-h-64 overflow-y-auto">
+                            <!-- Projects will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+            <div class="gradient-bg text-white p-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">📤 رفع الملفات</h2>
+                    <button id="closeUploadModal" class="text-white/80 hover:text-white text-2xl">×</button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+                    <div class="text-4xl mb-4">📁</div>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">اسحب الملفات هنا أو انقر للاختيار</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-500 mb-4">الملفات المدعومة: MP4, MP3, WAV, JPG, PNG, GIF</p>
+                    <input type="file" id="fileInput" multiple="" accept="video/*,audio/*,image/*" class="hidden">
+                    <button id="selectFilesBtn" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark">
+                        اختيار الملفات
+                    </button>
+                </div>
+                
+                <div id="uploadProgress" class="mt-6 hidden">
+                    <div class="space-y-3">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                            <div id="uploadProgressBar" class="bg-primary h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="uploadStatusText" class="text-center text-sm text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                </div>
+                
+                <div id="uploadedFiles" class="mt-6 space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Uploaded files will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Script Input Panel -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+                        ✍️ إدخال النص والسيناريو
+                    </h2>
+                    
+                    <!-- Dialect Selection -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">اختيار اللهجة:</label>
+                        <select id="dialectSelect" class="w-full text-base px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="standard">العربية الفصحى</option>
+                            <option value="gulf">الخليجية (السعودية/الإمارات)</option>
+                            <option value="egyptian">المصرية</option>
+                            <option value="levantine">الشامية (سوريا/لبنان/فلسطين/الأردن)</option>
+                            <option value="maghrebi">المغربية (المغرب/الجزائر/تونس)</option>
+                            <option value="iraqi">العراقية</option>
+                            <option value="sudanese">السودانية</option>
+                        </select>
+                    </div>
+
+                    <!-- Script Input -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">النص أو الفكرة:</label>
+                        <textarea id="scriptInput" placeholder="اكتب هنا السيناريو أو الفكرة التي تريد تحويلها إلى فيديو... مثال: قصة كوميدية عن طالب ينسى واجباته المدرسية" class="w-full h-32 text-base px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent resize-none" dir="rtl"></textarea>
+                    </div>
+
+                    <!-- Theme Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">نوع المحتوى:</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="comedy">
+                                😂 كوميدي
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="drama">
+                                🎭 دراما
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="anime">
+                                🎌 أنمي
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="horror">
+                                👻 رعب
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="educational">
+                                📚 تعليمي
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="religious">
+                                🕌 ديني
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="documentary">
+                                🎥 وثائقي
+                            </button>
+                            <button class="theme-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors" data-theme="action">
+                                ⚡ أكشن
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generateBtn" class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-6 rounded-lg transition-colors text-lg">
+                        🚀 إنشاء الفيديو بالذكاء الاصطناعي
+                    </button>
+                </div>
+
+                <!-- Timeline Editor -->
+                <div id="timelineEditor" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hidden">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        ⏱️ محرر الجدول الزمني
+                    </h3>
+                    
+                    <div class="timeline-container">
+                        <!-- Timeline Header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex gap-2">
+                                <button id="playBtn" class="bg-emerald text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition-colors">
+                                    ▶️ تشغيل
+                                </button>
+                                <button id="pauseBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                                    ⏸️ إيقاف
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                المدة: <span id="totalDuration">0:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Tracks -->
+                        <div class="space-y-3">
+                            <!-- Video Track -->
+                            <div class="timeline-track rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium">🎬 المقاطع المرئية</span>
+                                </div>
+                                <div id="videoTrack" class="flex gap-2 min-h-[60px] items-center">
+                                    <!-- Video clips will be added here -->
+                                </div>
+                            </div>
+
+                            <!-- Audio Track -->
+                            <div class="timeline-track rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium">🎵 الصوت والتعليق</span>
+                                </div>
+                                <div id="audioTrack" class="flex gap-2 min-h-[60px] items-center">
+                                    <!-- Audio clips will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="space-y-6">
+                
+                <!-- Analysis Results -->
+                <div id="analysisPanel" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hidden">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        🧠 تحليل النص
+                    </h3>
+                    <div id="analysisResults" class="space-y-3">
+                        <!-- Analysis results will appear here -->
+                    </div>
+                </div>
+
+                <!-- Voice Settings -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        🎤 إعدادات الصوت
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">نوع الصوت:</label>
+                            <select id="voiceType" class="w-full text-base px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                <option value="male">ذكر</option>
+                                <option value="female">أنثى</option>
+                                <option value="child">طفل</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">طبقة الصوت:</label>
+                            <select id="voiceTone" class="w-full text-base px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                <option value="calm">هادئ</option>
+                                <option value="energetic">حماسي</option>
+                                <option value="dramatic">دراما</option>
+                                <option value="funny">مضحك</option>
+                                <option value="serious">جدي</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2">سرعة الكلام:</label>
+                            <input type="range" id="speechSpeed" min="0.5" max="2" step="0.1" value="1" class="w-full">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 text-center">
+                                <span id="speedValue">1.0x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Panel -->
+                <div id="previewPanel" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hidden">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        👁️ معاينة مباشرة
+                    </h3>
+                    
+                    <div id="videoPreview" class="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-gray-500 dark:text-gray-400">معاينة الفيديو</span>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button id="exportBtn" class="flex-1 bg-gold text-white font-semibold py-3 px-4 rounded-lg hover:bg-yellow-600 transition-colors">
+                            📥 تصدير الفيديو
+                        </button>
+                        <button id="shareBtn" class="flex-1 bg-emerald text-white font-semibold py-3 px-4 rounded-lg hover:bg-emerald-600 transition-colors">
+                            📤 مشاركة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Panel -->
+                <div id="progressPanel" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hidden">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        ⏳ حالة الإنشاء
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div id="progressSteps" class="space-y-3">
+                            <!-- Progress steps will be added here -->
+                        </div>
+                        
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                            <div id="progressBar" class="bg-primary h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+                            <span id="progressText">جاري التحضير...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Projects Section -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-semibold mb-6 text-center">💡 أمثلة وإلهام</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sample-card cursor-pointer hover:shadow-xl transition-shadow" data-sample="comedy">
+                    <div class="text-4xl mb-3 text-center">😂</div>
+                    <h3 class="font-semibold text-lg mb-2">قصة كوميدية</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">طالب ينسى واجباته ويحاول إنجازها في اللحظة الأخيرة</p>
+                    <div class="text-xs text-primary">اللهجة: مصرية • المدة: 2 دقيقة</div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sample-card cursor-pointer hover:shadow-xl transition-shadow" data-sample="educational">
+                    <div class="text-4xl mb-3 text-center">📚</div>
+                    <h3 class="font-semibold text-lg mb-2">محتوى تعليمي</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">شرح مبسط لعملية البناء الضوئي في النباتات</p>
+                    <div class="text-xs text-primary">اللهجة: فصحى • المدة: 3 دقائق</div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sample-card cursor-pointer hover:shadow-xl transition-shadow" data-sample="drama">
+                    <div class="text-4xl mb-3 text-center">🎭</div>
+                    <h3 class="font-semibold text-lg mb-2">مشهد درامي</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">حوار مؤثر بين أب وابنه عن أهمية التعليم</p>
+                    <div class="text-xs text-primary">اللهجة: شامية • المدة: 4 دقائق</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Global variables
+        let selectedTheme = '';
+        let currentProject = null;
+        let videoClips = [];
+        let audioClips = [];
+        let userAssets = [];
+        let projects = [];
+        let markdownEditor = null;
+
+        // Theme data for different content types
+        const themeData = {
+            comedy: {
+                name: 'كوميدي',
+                emoji: '😂',
+                colors: ['#FFE066', '#FF6B6B'],
+                prompts: {
+                    video: 'Create a humorous scene with exaggerated expressions and comedic timing',
+                    style: 'bright, colorful, cartoonish style with dynamic movements'
+                }
+            },
+            drama: {
+                name: 'دراما',
+                emoji: '🎭',
+                colors: ['#6366F1', '#8B5CF6'],
+                prompts: {
+                    video: 'Create a dramatic scene with emotional depth and cinematic lighting',
+                    style: 'cinematic, emotional, with warm dramatic lighting'
+                }
+            },
+            anime: {
+                name: 'أنمي',
+                emoji: '🎌',
+                colors: ['#EC4899', '#8B5CF6'],
+                prompts: {
+                    video: 'Create an anime-style scene with characteristic art style and expressions',
+                    style: 'anime art style, vibrant colors, dramatic expressions'
+                }
+            },
+            horror: {
+                name: 'رعب',
+                emoji: '👻',
+                colors: ['#1F2937', '#7C3AED'],
+                prompts: {
+                    video: 'Create a suspenseful horror scene with eerie atmosphere',
+                    style: 'dark, moody, suspenseful with dramatic shadows'
+                }
+            },
+            educational: {
+                name: 'تعليمي',
+                emoji: '📚',
+                colors: ['#059669', '#0EA5E9'],
+                prompts: {
+                    video: 'Create an educational scene that clearly explains concepts',
+                    style: 'clean, professional, informative with clear visuals'
+                }
+            },
+            religious: {
+                name: 'ديني',
+                emoji: '🕌',
+                colors: ['#D4A574', '#059669'],
+                prompts: {
+                    video: 'Create a respectful religious scene with spiritual atmosphere',
+                    style: 'serene, respectful, with warm golden lighting'
+                }
+            },
+            documentary: {
+                name: 'وثائقي',
+                emoji: '🎥',
+                colors: ['#6B7280', '#374151'],
+                prompts: {
+                    video: 'Create a documentary-style scene with realistic presentation',
+                    style: 'realistic, documentary style with natural lighting'
+                }
+            },
+            action: {
+                name: 'أكشن',
+                emoji: '⚡',
+                colors: ['#EF4444', '#F59E0B'],
+                prompts: {
+                    video: 'Create an action scene with dynamic movement and energy',
+                    style: 'dynamic, high-energy with dramatic camera angles'
+                }
+            }
+        };
+
+        // Dialect voice mappings
+        const dialectVoices = {
+            standard: 'Monika Sogam',
+            gulf: 'Sarah',
+            egyptian: 'Jessica',
+            levantine: 'River',
+            maghrebi: 'Lily',
+            iraqi: 'George',
+            sudanese: 'Brian'
+        };
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            setupVoiceControls();
+            loadSampleProjects();
+            initializeFileUpload();
+            initializeProjectManager();
+            loadProjects();
+        });
+
+        function initializeEventListeners() {
+            // Theme selection
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.theme-btn').forEach(b => {
+                        b.classList.remove('border-primary', 'bg-primary', 'text-white');
+                        b.classList.add('border-gray-300', 'dark:border-gray-600');
+                    });
+                    
+                    this.classList.remove('border-gray-300', 'dark:border-gray-600');
+                    this.classList.add('border-primary', 'bg-primary', 'text-white');
+                    selectedTheme = this.dataset.theme;
+                });
+            });
+
+            // Generate button
+            document.getElementById('generateBtn').addEventListener('click', generateVideo);
+
+            // Sample projects
+            document.querySelectorAll('.sample-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    loadSampleProject(this.dataset.sample);
+                });
+            });
+
+            // Timeline controls
+            document.getElementById('playBtn').addEventListener('click', playTimeline);
+            document.getElementById('pauseBtn').addEventListener('click', pauseTimeline);
+            
+            // Export controls
+            document.getElementById('exportBtn').addEventListener('click', exportVideo);
+            document.getElementById('shareBtn').addEventListener('click', shareVideo);
+        }
+
+        function setupVoiceControls() {
+            const speechSpeed = document.getElementById('speechSpeed');
+            const speedValue = document.getElementById('speedValue');
+            
+            speechSpeed.addEventListener('input', function() {
+                speedValue.textContent = this.value + 'x';
+            });
+        }
+
+        function loadSampleProjects() {
+            const samples = {
+                comedy: {
+                    script: "في يوم من الأيام، كان هناك طالب اسمه أحمد. أحمد معروف بأنه دائماً ينسى واجباته المدرسية. في صباح يوم الامتحان، استيقظ أحمد ليجد أنه لم يذاكر شيئاً! بدأ يركض في البيت مثل الدجاجة بلا رأس، يبحث عن كتبه تحت السرير وفي الثلاجة!",
+                    dialect: "egyptian",
+                    theme: "comedy"
+                },
+                educational: {
+                    script: "البناء الضوئي هو العملية التي تقوم بها النباتات لتحويل ضوء الشمس إلى طاقة. تحدث هذه العملية في أوراق النباتات حيث يتفاعل ثاني أكسيد الكربون مع الماء بوجود ضوء الشمس لإنتاج الجلوكوز والأكسجين.",
+                    dialect: "standard",
+                    theme: "educational"
+                },
+                drama: {
+                    script: "جلس الأب مع ابنه على الشرفة في المساء. نظر إليه بحنان وقال: 'يا بني، التعليم هو الكنز الوحيد الذي لا يستطيع أحد أن يسرقه منك. عندما تتعلم، تفتح أمامك أبواب المستقبل المشرق.'",
+                    dialect: "levantine",
+                    theme: "drama"
+                }
+            };
+
+            return samples;
+        }
+
+        function loadSampleProject(sampleType) {
+            const samples = loadSampleProjects();
+            const sample = samples[sampleType];
+            
+            if (sample) {
+                document.getElementById('scriptInput').value = sample.script;
+                document.getElementById('dialectSelect').value = sample.dialect;
+                
+                // Select theme
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('border-primary', 'bg-primary', 'text-white');
+                    btn.classList.add('border-gray-300', 'dark:border-gray-600');
+                });
+                
+                const themeBtn = document.querySelector(`[data-theme="${sample.theme}"]`);
+                if (themeBtn) {
+                    themeBtn.classList.remove('border-gray-300', 'dark:border-gray-600');
+                    themeBtn.classList.add('border-primary', 'bg-primary', 'text-white');
+                    selectedTheme = sample.theme;
+                }
+
+                // Show notification
+                showNotification('تم تحميل المثال بنجاح! يمكنك الآن إنشاء الفيديو.', 'success');
+            }
+        }
+
+        async function generateVideo() {
+            const script = document.getElementById('scriptInput').value.trim();
+            const dialect = document.getElementById('dialectSelect').value;
+            
+            if (!script) {
+                showNotification('يرجى إدخال نص أو سيناريو أولاً', 'error');
+                return;
+            }
+            
+            if (!selectedTheme) {
+                showNotification('يرجى اختيار نوع المحتوى', 'error');
+                return;
+            }
+
+            // Show progress panel
+            showProgressPanel();
+            
+            try {
+                // Step 1: Analyze script
+                updateProgress(1, 'تحليل النص وتحديد المشاعر...');
+                await analyzeScript(script, dialect);
+                
+                // Step 2: Generate video
+                updateProgress(2, 'إنشاء المقاطع المرئية...');
+                await generateVideoClips(script);
+                
+                // Step 3: Generate voiceover
+                updateProgress(3, 'إنشاء التعليق الصوتي...');
+                await generateVoiceover(script, dialect);
+                
+                // Step 4: Show timeline
+                updateProgress(4, 'إعداد محرر الجدول الزمني...');
+                showTimelineEditor();
+                
+                // Step 5: Complete
+                updateProgress(5, 'تم إنشاء الفيديو بنجاح!');
+                showPreviewPanel();
+                
+            } catch (error) {
+                console.error('Error generating video:', error);
+                showNotification('حدث خطأ أثناء إنشاء الفيديو: ' + error.message, 'error');
+                hideProgressPanel();
+            }
+        }
+
+        async function analyzeScript(script, dialect) {
+            // Register handler for script analysis
+            window.Poe.registerHandler("script-analysis", (result, context) => {
+                const msg = result.responses[0];
+                
+                if (msg.status === "error") {
+                    throw new Error(msg.statusText || "خطأ في تحليل النص");
+                } else if (msg.status === "complete") {
+                    try {
+                        // Parse the analysis result
+                        const analysis = JSON.parse(msg.content);
+                        displayAnalysisResults(analysis);
+                    } catch (e) {
+                        // If not JSON, display as text
+                        displayAnalysisResults({
+                            mood: "تم التحليل",
+                            tone: "متوسط",
+                            themes: ["عام"],
+                            suggestions: msg.content
+                        });
+                    }
+                }
+            });
+
+            const analysisPrompt = `قم بتحليل النص التالي باللغة العربية وتحديد المعلومات التالية. أجب باللغة العربية فقط ولا تستخدم أي لغة أخرى:
+
+النص: "${script}"
+اللهجة: ${dialect}
+نوع المحتوى: ${themeData[selectedTheme]?.name || selectedTheme}
+
+قدم تحليلاً للنص يتضمن:
+1. المشاعر السائدة في النص
+2. نبرة الكلام المناسبة
+3. المواضيع الرئيسية
+4. اقتراحات لتحسين السيناريو
+
+تأكد من أن التحليل مناسب للثقافة العربية واللهجة المحددة.`;
+
+            await window.Poe.sendUserMessage(
+                `@Claude-Sonnet-4 ${analysisPrompt}`,
+                {
+                    handler: "script-analysis",
+                    stream: false,
+                    openChat: false
+                }
+            );
+        }
+
+        async function generateVideoClips(script) {
+            // Register handler for video generation
+            window.Poe.registerHandler("video-generation", (result, context) => {
+                const msg = result.responses[0];
+                
+                if (msg.status === "error") {
+                    throw new Error(msg.statusText || "خطأ في إنشاء الفيديو");
+                } else if (msg.status === "incomplete") {
+                    // Show progress for video generation
+                    document.getElementById('progressText').textContent = 'جاري إنشاء الفيديو... ' + msg.content;
+                } else if (msg.status === "complete") {
+                    if (msg.attachments && msg.attachments.length > 0) {
+                        const videoAttachment = msg.attachments[0];
+                        addVideoClip({
+                            url: videoAttachment.url,
+                            name: videoAttachment.name,
+                            duration: 10 // Default duration
+                        });
+                    }
+                }
+            });
+
+            const theme = themeData[selectedTheme];
+            const videoPrompt = `${script}. ${theme.prompts.video}, ${theme.prompts.style} --duration 10 --aspect-ratio 16:9`;
+
+            await window.Poe.sendUserMessage(
+                `@Runway-Gen-4-Turbo ${videoPrompt}`,
+                {
+                    handler: "video-generation",
+                    stream: true,
+                    openChat: false
+                }
+            );
+        }
+
+        async function generateVoiceover(script, dialect) {
+            // Register handler for voice generation
+            window.Poe.registerHandler("voice-generation", (result, context) => {
+                const msg = result.responses[0];
+                
+                if (msg.status === "error") {
+                    throw new Error(msg.statusText || "خطأ في إنشاء الصوت");
+                } else if (msg.status === "complete") {
+                    if (msg.attachments && msg.attachments.length > 0) {
+                        const audioAttachment = msg.attachments[0];
+                        addAudioClip({
+                            url: audioAttachment.url,
+                            name: audioAttachment.name,
+                            duration: 15 // Default duration
+                        });
+                    }
+                }
+            });
+
+            const voiceType = document.getElementById('voiceType').value;
+            const voiceTone = document.getElementById('voiceTone').value;
+            const voiceName = dialectVoices[dialect] || 'Monika Sogam';
+            
+            let voicePrompt = script;
+            
+            // Add voice parameters
+            voicePrompt += ` --voice ${voiceName}`;
+            
+            // Add language code for Arabic
+            if (dialect !== 'standard') {
+                voicePrompt += ` --language ar`;
+            }
+
+            await window.Poe.sendUserMessage(
+                `@ElevenLabs ${voicePrompt}`,
+                {
+                    handler: "voice-generation",
+                    stream: false,
+                    openChat: false
+                }
+            );
+        }
+
+        function displayAnalysisResults(analysis) {
+            const analysisPanel = document.getElementById('analysisPanel');
+            const analysisResults = document.getElementById('analysisResults');
+            
+            analysisResults.innerHTML = `
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                    <h4 class="font-medium text-blue-900 dark:text-blue-100">المشاعر السائدة:</h4>
+                    <p class="text-blue-700 dark:text-blue-300">${analysis.mood || 'إيجابي'}</p>
+                </div>
+                <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                    <h4 class="font-medium text-green-900 dark:text-green-100">نبرة الكلام:</h4>
+                    <p class="text-green-700 dark:text-green-300">${analysis.tone || 'متوسط'}</p>
+                </div>
+                <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
+                    <h4 class="font-medium text-purple-900 dark:text-purple-100">المواضيع الرئيسية:</h4>
+                    <p class="text-purple-700 dark:text-purple-300">${Array.isArray(analysis.themes) ? analysis.themes.join('، ') : 'عام'}</p>
+                </div>
+                ${analysis.suggestions ? `
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
+                    <h4 class="font-medium text-yellow-900 dark:text-yellow-100">اقتراحات التحسين:</h4>
+                    <p class="text-yellow-700 dark:text-yellow-300 text-sm">${analysis.suggestions}</p>
+                </div>
+                ` : ''}
+            `;
+            
+            analysisPanel.classList.remove('hidden');
+            analysisPanel.classList.add('slide-in');
+        }
+
+        function addVideoClip(clip) {
+            videoClips.push(clip);
+            const videoTrack = document.getElementById('videoTrack');
+            
+            const clipElement = document.createElement('div');
+            clipElement.className = 'bg-blue-500 text-white p-2 rounded text-xs cursor-pointer hover:bg-blue-600 transition-colors min-w-[100px]';
+            clipElement.innerHTML = `
+                <div class="font-medium">🎬 مقطع ${videoClips.length}</div>
+                <div class="text-blue-100">${clip.duration}s</div>
+            `;
+            
+            clipElement.addEventListener('click', () => previewClip(clip));
+            videoTrack.appendChild(clipElement);
+            
+            updateTotalDuration();
+        }
+
+        function addAudioClip(clip) {
+            audioClips.push(clip);
+            const audioTrack = document.getElementById('audioTrack');
+            
+            const clipElement = document.createElement('div');
+            clipElement.className = 'bg-green-500 text-white p-2 rounded text-xs cursor-pointer hover:bg-green-600 transition-colors min-w-[100px]';
+            clipElement.innerHTML = `
+                <div class="font-medium">🎤 تعليق ${audioClips.length}</div>
+                <div class="text-green-100">${clip.duration}s</div>
+            `;
+            
+            clipElement.addEventListener('click', () => previewClip(clip));
+            audioTrack.appendChild(clipElement);
+            
+            updateTotalDuration();
+        }
+
+        function previewClip(clip) {
+            const videoPreview = document.getElementById('videoPreview');
+            
+            if (clip.url.includes('video') || clip.name.includes('mp4')) {
+                videoPreview.innerHTML = `
+                    <video controls class="w-full h-full rounded-lg">
+                        <source src="${clip.url}" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو
+                    </video>
+                `;
+            } else if (clip.url.includes('audio') || clip.name.includes('mp3')) {
+                videoPreview.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="text-4xl mb-4">🎵</div>
+                        <audio controls class="w-full">
+                            <source src="${clip.url}" type="audio/mpeg">
+                            متصفحك لا يدعم تشغيل الصوت
+                        </audio>
+                    </div>
+                `;
+            }
+        }
+
+        function updateTotalDuration() {
+            const totalSeconds = Math.max(
+                videoClips.reduce((sum, clip) => sum + clip.duration, 0),
+                audioClips.reduce((sum, clip) => sum + clip.duration, 0)
+            );
+            
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            document.getElementById('totalDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showProgressPanel() {
+            const progressPanel = document.getElementById('progressPanel');
+            const progressSteps = document.getElementById('progressSteps');
+            
+            progressSteps.innerHTML = `
+                <div class="progress-step flex items-center gap-3" data-step="1">
+                    <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm">1</div>
+                    <span>تحليل النص</span>
+                </div>
+                <div class="progress-step flex items-center gap-3" data-step="2">
+                    <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm">2</div>
+                    <span>إنشاء الفيديو</span>
+                </div>
+                <div class="progress-step flex items-center gap-3" data-step="3">
+                    <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm">3</div>
+                    <span>إنشاء الصوت</span>
+                </div>
+                <div class="progress-step flex items-center gap-3" data-step="4">
+                    <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm">4</div>
+                    <span>إعداد التحرير</span>
+                </div>
+                <div class="progress-step flex items-center gap-3" data-step="5">
+                    <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm">5</div>
+                    <span>الانتهاء</span>
+                </div>
+            `;
+            
+            progressPanel.classList.remove('hidden');
+            progressPanel.classList.add('fade-in');
+        }
+
+        function updateProgress(step, message) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressStep = document.querySelector(`[data-step="${step}"]`);
+            
+            // Update progress bar
+            const percentage = (step / 5) * 100;
+            progressBar.style.width = percentage + '%';
+            
+            // Update text
+            progressText.textContent = message;
+            
+            // Update step indicator
+            if (progressStep) {
+                const circle = progressStep.querySelector('div');
+                circle.classList.remove('bg-gray-300', 'dark:bg-gray-600');
+                circle.classList.add('bg-primary', 'text-white');
+                circle.innerHTML = '✓';
+            }
+        }
+
+        function hideProgressPanel() {
+            const progressPanel = document.getElementById('progressPanel');
+            progressPanel.classList.add('hidden');
+        }
+
+        function showTimelineEditor() {
+            const timelineEditor = document.getElementById('timelineEditor');
+            timelineEditor.classList.remove('hidden');
+            timelineEditor.classList.add('slide-in');
+        }
+
+        function showPreviewPanel() {
+            const previewPanel = document.getElementById('previewPanel');
+            previewPanel.classList.remove('hidden');
+            previewPanel.classList.add('fade-in');
+        }
+
+        function playTimeline() {
+            showNotification('تم بدء تشغيل الفيديو', 'success');
+            // Timeline playback logic would go here
+        }
+
+        function pauseTimeline() {
+            showNotification('تم إيقاف تشغيل الفيديو', 'info');
+            // Timeline pause logic would go here
+        }
+
+        function exportVideo() {
+            showNotification('جاري تصدير الفيديو... سيتم التحميل قريباً', 'success');
+            
+            // Simulate export process
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.download = `arabic_ai_video_${Date.now()}.mp4`;
+                link.textContent = 'تحميل الفيديو';
+                link.className = 'text-primary underline';
+                
+                showNotification('تم تصدير الفيديو بنجاح!', 'success');
+            }, 2000);
+        }
+
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'فيديو ذكي بالعربية',
+                    text: 'شاهد هذا الفيديو المُنشأ بالذكاء الاصطناعي',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    showNotification('تم نسخ الرابط للحافظة', 'success');
+                });
+            }
+        }
+
+        // Advanced Features: File Upload System
+        function initializeFileUpload() {
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadModal = document.getElementById('uploadModal');
+            const closeUploadModal = document.getElementById('closeUploadModal');
+            const selectFilesBtn = document.getElementById('selectFilesBtn');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadBtn.addEventListener('click', () => {
+                uploadModal.classList.remove('hidden');
+            });
+
+            closeUploadModal.addEventListener('click', () => {
+                uploadModal.classList.add('hidden');
+            });
+
+            selectFilesBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', handleFileUpload);
+
+            // Drag and drop functionality
+            const dropZone = uploadModal.querySelector('.border-dashed');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-primary', 'bg-primary/10');
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-primary/10');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-primary/10');
+                const files = Array.from(e.dataTransfer.files);
+                processFiles(files);
+            });
+        }
+
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadProgressBar = document.getElementById('uploadProgressBar');
+            const uploadStatusText = document.getElementById('uploadStatusText');
+            const uploadedFiles = document.getElementById('uploadedFiles');
+
+            uploadProgress.classList.remove('hidden');
+
+            files.forEach((file, index) => {
+                // Validate file type
+                const validTypes = ['video/', 'audio/', 'image/'];
+                const isValid = validTypes.some(type => file.type.startsWith(type));
+
+                if (!isValid) {
+                    showNotification(`نوع الملف غير مدعوم: ${file.name}`, 'error');
+                    return;
+                }
+
+                // Simulate upload progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 20;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // Add file to user assets
+                        const fileUrl = URL.createObjectURL(file);
+                        const asset = {
+                            id: Date.now() + index,
+                            name: file.name,
+                            type: file.type.split('/')[0],
+                            size: file.size,
+                            url: fileUrl,
+                            file: file,
+                            duration: estimateFileDuration(file)
+                        };
+
+                        userAssets.push(asset);
+                        displayUploadedFile(asset);
+                        
+                        uploadStatusText.textContent = `تم رفع ${file.name} بنجاح`;
+                        
+                        setTimeout(() => {
+                            if (index === files.length - 1) {
+                                uploadProgress.classList.add('hidden');
+                                uploadProgressBar.style.width = '0%';
+                                showNotification('تم رفع جميع الملفات بنجاح!', 'success');
+                            }
+                        }, 1000);
+                    }
+                    
+                    uploadProgressBar.style.width = progress + '%';
+                    uploadStatusText.textContent = `جاري رفع ${file.name}... ${Math.round(progress)}%`;
+                }, 100);
+            });
+        }
+
+        function estimateFileDuration(file) {
+            // Estimate duration based on file type and size
+            if (file.type.startsWith('video/')) {
+                return Math.max(5, Math.min(60, Math.round(file.size / (1024 * 1024)))); // Rough estimate
+            } else if (file.type.startsWith('audio/')) {
+                return Math.max(3, Math.min(180, Math.round(file.size / (1024 * 256)))); // Rough estimate
+            } else {
+                return 5; // Default for images
+            }
+        }
+
+        function displayUploadedFile(asset) {
+            const uploadedFiles = document.getElementById('uploadedFiles');
+            
+            const fileElement = document.createElement('div');
+            fileElement.className = 'flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg';
+            
+            const typeIcon = asset.type === 'video' ? '🎬' : asset.type === 'audio' ? '🎵' : '🖼️';
+            
+            fileElement.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">${typeIcon}</span>
+                    <div>
+                        <div class="font-medium text-sm">${asset.name}</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">
+                            ${(asset.size / (1024 * 1024)).toFixed(1)} MB • ${asset.duration}s
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="previewUserAsset('${asset.id}')" class="text-primary hover:text-primary-dark text-sm">
+                        👁️ معاينة
+                    </button>
+                    <button onclick="addAssetToTimeline('${asset.id}')" class="text-green-600 hover:text-green-800 text-sm">
+                        ➕ إضافة للجدول
+                    </button>
+                </div>
+            `;
+            
+            uploadedFiles.appendChild(fileElement);
+        }
+
+        function previewUserAsset(assetId) {
+            const asset = userAssets.find(a => a.id == assetId);
+            if (!asset) return;
+
+            const videoPreview = document.getElementById('videoPreview');
+            
+            if (asset.type === 'video') {
+                videoPreview.innerHTML = `
+                    <video controls class="w-full h-full rounded-lg">
+                        <source src="${asset.url}" type="${asset.file.type}">
+                        متصفحك لا يدعم تشغيل الفيديو
+                    </video>
+                `;
+            } else if (asset.type === 'audio') {
+                videoPreview.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="text-4xl mb-4">🎵</div>
+                        <div class="text-lg font-medium mb-4">${asset.name}</div>
+                        <audio controls class="w-full max-w-md">
+                            <source src="${asset.url}" type="${asset.file.type}">
+                            متصفحك لا يدعم تشغيل الصوت
+                        </audio>
+                    </div>
+                `;
+            } else if (asset.type === 'image') {
+                videoPreview.innerHTML = `
+                    <div class="flex items-center justify-center h-full">
+                        <img src="${asset.url}" alt="${asset.name}" class="max-w-full max-h-full rounded-lg">
+                    </div>
+                `;
+            }
+
+            // Show preview panel
+            document.getElementById('previewPanel').classList.remove('hidden');
+            showNotification(`معاينة ${asset.name}`, 'info');
+        }
+
+        function addAssetToTimeline(assetId) {
+            const asset = userAssets.find(a => a.id == assetId);
+            if (!asset) return;
+
+            if (asset.type === 'video' || asset.type === 'image') {
+                addVideoClip({
+                    id: asset.id,
+                    url: asset.url,
+                    name: asset.name,
+                    duration: asset.duration,
+                    type: 'user',
+                    isUserAsset: true
+                });
+            } else if (asset.type === 'audio') {
+                addAudioClip({
+                    id: asset.id,
+                    url: asset.url,
+                    name: asset.name,
+                    duration: asset.duration,
+                    type: 'user',
+                    isUserAsset: true
+                });
+            }
+
+            showTimelineEditor();
+            showNotification(`تم إضافة ${asset.name} للجدول الزمني`, 'success');
+        }
+
+        // Project Management System
+        function initializeProjectManager() {
+            const projectManagerBtn = document.getElementById('projectManagerBtn');
+            const projectModal = document.getElementById('projectModal');
+            const closeProjectModal = document.getElementById('closeProjectModal');
+            const createProjectBtn = document.getElementById('createProjectBtn');
+
+            projectManagerBtn.addEventListener('click', () => {
+                projectModal.classList.remove('hidden');
+                loadProjectsList();
+            });
+
+            closeProjectModal.addEventListener('click', () => {
+                projectModal.classList.add('hidden');
+            });
+
+            createProjectBtn.addEventListener('click', createNewProject);
+        }
+
+        function createNewProject() {
+            const projectName = document.getElementById('newProjectName').value.trim();
+            const projectDesc = document.getElementById('newProjectDesc').value.trim();
+
+            if (!projectName) {
+                showNotification('يرجى إدخال اسم المشروع', 'error');
+                return;
+            }
+
+            const project = {
+                id: Date.now(),
+                name: projectName,
+                description: projectDesc,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                script: '',
+                dialect: 'standard',
+                theme: '',
+                videoClips: [],
+                audioClips: [],
+                userAssets: []
+            };
+
+            projects.push(project);
+            saveProjects();
+            loadProject(project);
+            
+            document.getElementById('newProjectName').value = '';
+            document.getElementById('newProjectDesc').value = '';
+            document.getElementById('projectModal').classList.add('hidden');
+            
+            showNotification(`تم إنشاء المشروع "${projectName}" بنجاح`, 'success');
+        }
+
+        function loadProjectsList() {
+            const projectsList = document.getElementById('projectsList');
+            
+            if (projects.length === 0) {
+                projectsList.innerHTML = `
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                        <div class="text-4xl mb-2">📝</div>
+                        <p>لا توجد مشاريع محفوظة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            projectsList.innerHTML = projects.map(project => `
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-medium">${project.name}</h4>
+                        <div class="flex gap-1">
+                            <button onclick="loadProject({id: ${project.id}})" class="text-blue-600 hover:text-blue-800 text-sm">
+                                📂 تحميل
+                            </button>
+                            <button onclick="deleteProject(${project.id})" class="text-red-600 hover:text-red-800 text-sm">
+                                🗑️ حذف
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">${project.description || 'بدون وصف'}</p>
+                    <div class="text-xs text-gray-500 dark:text-gray-500">
+                        آخر تحديث: ${new Date(project.updatedAt).toLocaleDateString('ar-SA')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadProject(projectRef) {
+            const project = projects.find(p => p.id === projectRef.id);
+            if (!project) return;
+
+            currentProject = project;
+            
+            // Load project data
+            document.getElementById('scriptInput').value = project.script || '';
+            document.getElementById('dialectSelect').value = project.dialect || 'standard';
+            
+            // Load theme
+            if (project.theme) {
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('border-primary', 'bg-primary', 'text-white');
+                    btn.classList.add('border-gray-300', 'dark:border-gray-600');
+                });
+                
+                const themeBtn = document.querySelector(`[data-theme="${project.theme}"]`);
+                if (themeBtn) {
+                    themeBtn.classList.remove('border-gray-300', 'dark:border-gray-600');
+                    themeBtn.classList.add('border-primary', 'bg-primary', 'text-white');
+                    selectedTheme = project.theme;
+                }
+            }
+
+            // Load clips
+            videoClips = project.videoClips || [];
+            audioClips = project.audioClips || [];
+            userAssets = project.userAssets || [];
+
+            // Refresh timeline
+            refreshTimeline();
+            
+            document.getElementById('projectModal').classList.add('hidden');
+            showNotification(`تم تحميل المشروع "${project.name}"`, 'success');
+        }
+
+        function saveCurrentProject() {
+            if (!currentProject) return;
+
+            currentProject.script = document.getElementById('scriptInput').value;
+            currentProject.dialect = document.getElementById('dialectSelect').value;
+            currentProject.theme = selectedTheme;
+            currentProject.videoClips = videoClips;
+            currentProject.audioClips = audioClips;
+            currentProject.userAssets = userAssets;
+            currentProject.updatedAt = new Date().toISOString();
+
+            saveProjects();
+            showNotification('تم حفظ المشروع تلقائياً', 'success');
+        }
+
+        function deleteProject(projectId) {
+            if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
+                projects = projects.filter(p => p.id !== projectId);
+                saveProjects();
+                loadProjectsList();
+                showNotification('تم حذف المشروع', 'info');
+            }
+        }
+
+        function saveProjects() {
+            try {
+                // Use sessionStorage as localStorage is not available
+                sessionStorage.setItem('arabicVideoProjects', JSON.stringify(projects));
+            } catch (e) {
+                console.warn('Could not save projects:', e);
+            }
+        }
+
+        function loadProjects() {
+            try {
+                const savedProjects = sessionStorage.getItem('arabicVideoProjects');
+                if (savedProjects) {
+                    projects = JSON.parse(savedProjects);
+                }
+            } catch (e) {
+                console.warn('Could not load projects:', e);
+                projects = [];
+            }
+        }
+
+        function refreshTimeline() {
+            const videoTrack = document.getElementById('videoTrack');
+            const audioTrack = document.getElementById('audioTrack');
+            
+            videoTrack.innerHTML = '';
+            audioTrack.innerHTML = '';
+            
+            videoClips.forEach((clip, index) => {
+                const clipElement = document.createElement('div');
+                const bgColor = clip.isUserAsset ? 'bg-purple-500' : 'bg-blue-500';
+                const hoverColor = clip.isUserAsset ? 'hover:bg-purple-600' : 'hover:bg-blue-600';
+                
+                clipElement.className = `${bgColor} text-white p-2 rounded text-xs cursor-pointer ${hoverColor} transition-colors min-w-[100px]`;
+                clipElement.innerHTML = `
+                    <div class="font-medium">${clip.isUserAsset ? '📁' : '🎬'} ${clip.name}</div>
+                    <div class="text-blue-100">${clip.duration}s</div>
+                `;
+                
+                clipElement.addEventListener('click', () => previewClip(clip));
+                videoTrack.appendChild(clipElement);
+            });
+            
+            audioClips.forEach((clip, index) => {
+                const clipElement = document.createElement('div');
+                const bgColor = clip.isUserAsset ? 'bg-orange-500' : 'bg-green-500';
+                const hoverColor = clip.isUserAsset ? 'hover:bg-orange-600' : 'hover:bg-green-600';
+                
+                clipElement.className = `${bgColor} text-white p-2 rounded text-xs cursor-pointer ${hoverColor} transition-colors min-w-[100px]`;
+                clipElement.innerHTML = `
+                    <div class="font-medium">${clip.isUserAsset ? '📁' : '🎤'} ${clip.name}</div>
+                    <div class="text-green-100">${clip.duration}s</div>
+                `;
+                
+                clipElement.addEventListener('click', () => previewClip(clip));
+                audioTrack.appendChild(clipElement);
+            });
+            
+            updateTotalDuration();
+            
+            if (videoClips.length > 0 || audioClips.length > 0) {
+                showTimelineEditor();
+            }
+        }
+
+        // Auto-save functionality
+        setInterval(() => {
+            if (currentProject) {
+                saveCurrentProject();
+            }
+        }, 30000); // Auto-save every 30 seconds
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+            
+            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 slide-in`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+    </script>
+
+
+</body></html>
